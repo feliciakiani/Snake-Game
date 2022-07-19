@@ -5,6 +5,8 @@
  */
 package snakegame;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -14,8 +16,6 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.Timer;
@@ -27,23 +27,29 @@ public class Board extends JPanel implements ActionListener {
     private final int DOT_SIZE = 10;
     private final int ALL_DOTS = 900;
     private final int RANDOM_APPLE_POS = 29;
-    private final int DELAY = 140;
+    private final int DELAY = 200;
 
     private final int x[] = new int[ALL_DOTS];
     private final int y[] = new int[ALL_DOTS];
 
-    private int dots;
-    private int apple_x;
-    private int apple_y;
+    ArrayList<Integer> distances = new ArrayList<Integer>();
 
-    private boolean leftDirection = false;
-    private boolean rightDirection = true;
-    private boolean upDirection = false;
-    private boolean downDirection = false;
+    private int index = -1;
+    private int moveX = 0;
+    private int moveY = 0;
+    private int dist1;
+    private int dist2;
+    private int dist3;
+    private int apple_x1;
+    private int apple_y1;
+    private int apple_x2;
+    private int apple_y2;
+    private int apple_x3;
+    private int apple_y3;
+
     private boolean inGame = true;
 
     private Timer timer;
-    private Image ball;
     private Image apple;
     private Image head;
 
@@ -54,7 +60,6 @@ public class Board extends JPanel implements ActionListener {
     
     private void initBoard() {
 
-        addKeyListener(new TAdapter());
         setBackground(Color.black);
         setFocusable(true);
 
@@ -64,10 +69,6 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void loadImages() {
-
-        ImageIcon iid = new ImageIcon("src/resources/dot.png");
-        ball = iid.getImage();
-
         ImageIcon iia = new ImageIcon("src/resources/apple.png");
         apple = iia.getImage();
 
@@ -76,150 +77,120 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void initGame() {
+        x[0] = 150;
+        y[0] = 150;
 
-        dots = 3;
+        apple_x1 = ((int) (Math.random() * RANDOM_APPLE_POS)) * DOT_SIZE;
+        apple_y1 = ((int) (Math.random() * RANDOM_APPLE_POS)) * DOT_SIZE;
+        apple_x2 = ((int) (Math.random() * RANDOM_APPLE_POS)) * DOT_SIZE;
+        apple_y2 = ((int) (Math.random() * RANDOM_APPLE_POS)) * DOT_SIZE;
+        apple_x3 = ((int) (Math.random() * RANDOM_APPLE_POS)) * DOT_SIZE;
+        apple_y3 = ((int) (Math.random() * RANDOM_APPLE_POS)) * DOT_SIZE;
 
-        for (int z = 0; z < dots; z++) {
-            x[z] = 50 - z * 10;
-            y[z] = 50;
-        }
+        dist1 = checkDistance(apple_x1, apple_y1);
+        dist2 = checkDistance(apple_x2, apple_y2);
+        dist3 = checkDistance(apple_x3, apple_y3);
+
+        distances.add(dist1);
+        distances.add(dist2);
+        distances.add(dist3);
+        Collections.sort(distances);
         
-        locateApple();
-
         timer = new Timer(DELAY, this);
         timer.start();
+    }
+
+    private int checkDistance(int x1, int y1) {
+        return (Math.abs(x1-x[0]) + Math.abs(y1-y[0]));
     }
 
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-
         doDrawing(g);
     }
     
     private void doDrawing(Graphics g) {
-        
-        if (inGame) {
-
-            g.drawImage(apple, apple_x, apple_y, this);
-
-            for (int z = 0; z < dots; z++) {
-                if (z == 0) {
-                    g.drawImage(head, x[z], y[z], this);
-                } else {
-                    g.drawImage(ball, x[z], y[z], this);
-                }
-            }
-
-            Toolkit.getDefaultToolkit().sync();
-
-        } else {
-
+        if (index == 3) {
             gameOver(g);
-        }        
-    }
-
-    private void gameOver(Graphics g) {
-        
-        String msg = "Game Over";
-        Font small = new Font("Helvetica", Font.BOLD, 14);
-        FontMetrics metr = getFontMetrics(small);
-
-        g.setColor(Color.white);
-        g.setFont(small);
-        g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, B_HEIGHT / 2);
+            inGame = false;
+        } else {
+            g.drawImage(apple, apple_x1, apple_y1, this);
+            g.drawImage(apple, apple_x2, apple_y2, this);
+            g.drawImage(apple, apple_x3, apple_y3, this);
+            g.drawImage(head, x[0], y[0], this);
+    
+            Toolkit.getDefaultToolkit().sync();
+        }
     }
 
     private void checkApple() {
-
-        if ((x[0] == apple_x) && (y[0] == apple_y)) {
-
-            dots++;
-            locateApple();
+        if ((x[0] == apple_x1) && (y[0] == apple_y1)) {
+            apple_x1 = 99999;
+            apple_y1 = 99999;
+        }
+        if ((x[0] == apple_x2) && (y[0] == apple_y2)) {
+            apple_x2 = 99999;
+            apple_y2 = 99999;
+        }
+        if ((x[0] == apple_x3) && (y[0] == apple_y3)) {
+            apple_x3 = 99999;
+            apple_y3 = 99999;
         }
     }
 
     private void move() {
-
-        for (int z = dots; z > 0; z--) {
-            x[z] = x[(z - 1)];
-            y[z] = y[(z - 1)];
+        if (moveX == 0 && moveY == 0) {
+            index++;
+            if (index < 3) {
+                if (dist1 == distances.get(index)) {
+                    moveX = apple_x1 - x[0];
+                    moveY = apple_y1 - y[0];
+                } else if (dist2 == distances.get(index)) {
+                    moveX = apple_x2 - x[0];
+                    moveY = apple_y2 - y[0];
+                } else if (dist3 == distances.get(index)) {
+                    moveX = apple_x3 - x[0];
+                    moveY = apple_y3 - y[0];
+                }
+            }
         }
-
-        if (leftDirection) {
-            x[0] -= DOT_SIZE;
-        }
-
-        if (rightDirection) {
+        if (moveX > 0) {
             x[0] += DOT_SIZE;
+            moveX -= DOT_SIZE;
+        } else if (moveX < 0) {
+            x[0] -= DOT_SIZE;
+            moveX += DOT_SIZE;
+        } else {
+            if (moveY > 0) {
+                y[0] += DOT_SIZE;
+                moveY -= DOT_SIZE;
+            } else if (moveY < 0) {
+                y[0] -= DOT_SIZE;
+                moveY += DOT_SIZE;
+            }
         }
-
-        if (upDirection) {
-            y[0] -= DOT_SIZE;
-        }
-
-        if (downDirection) {
-            y[0] += DOT_SIZE;
-        }
-    }
-
-    private void checkCollision() {
-
-
-    }
-
-    private void locateApple() {
-
-        int r = (int) (Math.random() * RANDOM_APPLE_POS);
-        apple_x = ((r * DOT_SIZE));
-
-        r = (int) (Math.random() * RANDOM_APPLE_POS);
-        apple_y = ((r * DOT_SIZE));
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
 
         if (inGame) {
-
             checkApple();
-            checkCollision();
             move();
         }
 
         repaint();
     }
 
-    private class TAdapter extends KeyAdapter {
+    private void gameOver(Graphics g) {
+        
+        String msg = "Success!!";
+        Font small = new Font("Helvetica", Font.BOLD, 20);
+        FontMetrics metr = getFontMetrics(small);
 
-        @Override
-        public void keyPressed(KeyEvent e) {
-
-            int key = e.getKeyCode();
-
-            if ((key == KeyEvent.VK_LEFT) && (!rightDirection)) {
-                leftDirection = true;
-                upDirection = false;
-                downDirection = false;
-            }
-
-            if ((key == KeyEvent.VK_RIGHT) && (!leftDirection)) {
-                rightDirection = true;
-                upDirection = false;
-                downDirection = false;
-            }
-
-            if ((key == KeyEvent.VK_UP) && (!downDirection)) {
-                upDirection = true;
-                rightDirection = false;
-                leftDirection = false;
-            }
-
-            if ((key == KeyEvent.VK_DOWN) && (!upDirection)) {
-                downDirection = true;
-                rightDirection = false;
-                leftDirection = false;
-            }
-        }
+        g.setColor(Color.white);
+        g.setFont(small);
+        g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, B_HEIGHT / 2);
     }
 }
