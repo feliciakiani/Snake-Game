@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package snakegame;
 
 import java.util.ArrayList;
@@ -58,15 +53,15 @@ public class Board extends JPanel implements ActionListener {
     }
     
     private void initBoard() {
-
+        
         setBackground(Color.black);
         setFocusable(true);
-
+        
         setPreferredSize(new Dimension(B_WIDTH, B_HEIGHT));
         loadImages();
         initGame();
     }
-
+    
     private void loadImages() {
         ImageIcon iia = new ImageIcon("src/resources/apple.png");
         apple = iia.getImage();
@@ -94,12 +89,12 @@ public class Board extends JPanel implements ActionListener {
         timer = new Timer(DELAY, this);
         timer.start();
     }
-
+    
     public void updateDistance() {
         dist1 = checkDistance(apple_x1, apple_y1);
         dist2 = checkDistance(apple_x2, apple_y2);
         dist3 = checkDistance(apple_x3, apple_y3);
-
+        
         distances.set(0, dist1);
         distances.set(1, dist2);
         distances.set(2, dist3);
@@ -108,6 +103,18 @@ public class Board extends JPanel implements ActionListener {
 
     private int checkDistance(int x1, int y1) {
         return (Math.abs(x1-x[0]) + Math.abs(y1-y[0]));
+    }
+    
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+
+        if (inGame) {
+            checkApple();
+            move();
+        }
+
+        repaint();
     }
 
     @Override
@@ -124,7 +131,7 @@ public class Board extends JPanel implements ActionListener {
             g.drawImage(apple, apple_x2, apple_y2, this);
             g.drawImage(apple, apple_x3, apple_y3, this);
             g.drawImage(head, x[0], y[0], this);
-    
+            
             Toolkit.getDefaultToolkit().sync();
         }
     }
@@ -143,7 +150,7 @@ public class Board extends JPanel implements ActionListener {
             apple_y3 = 99999;
         }
     }
-
+    
     private void move() {
         if (moveX == 0 && moveY == 0) {
             updateDistance();
@@ -175,16 +182,6 @@ public class Board extends JPanel implements ActionListener {
         }
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-
-        if (inGame) {
-            checkApple();
-            move();
-        }
-
-        repaint();
-    }
 
     private void gameOver(Graphics g) {
         
