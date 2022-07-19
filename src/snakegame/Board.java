@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -22,7 +20,7 @@ public class Board extends JPanel implements ActionListener {
     private final int DOT_SIZE = 10;
     private final int ALL_DOTS = 900;
     private final int RANDOM_APPLE_POS = 29;
-    private final int DELAY = 200;
+    private final int DELAY = 150;
 
     private final int x[] = new int[ALL_DOTS];
     private final int y[] = new int[ALL_DOTS];
@@ -124,16 +122,12 @@ public class Board extends JPanel implements ActionListener {
     }
     
     private void doDrawing(Graphics g) {
-        if (!inGame) {
-            gameOver(g);
-        } else {
-            g.drawImage(apple, apple_x1, apple_y1, this);
-            g.drawImage(apple, apple_x2, apple_y2, this);
-            g.drawImage(apple, apple_x3, apple_y3, this);
-            g.drawImage(head, x[0], y[0], this);
-            
-            Toolkit.getDefaultToolkit().sync();
-        }
+        g.drawImage(apple, apple_x1, apple_y1, this);
+        g.drawImage(apple, apple_x2, apple_y2, this);
+        g.drawImage(apple, apple_x3, apple_y3, this);
+        g.drawImage(head, x[0], y[0], this);
+        
+        Toolkit.getDefaultToolkit().sync();
     }
 
     private void checkApple() {
@@ -164,33 +158,24 @@ public class Board extends JPanel implements ActionListener {
                 moveX = apple_x3 - x[0];
                 moveY = apple_y3 - y[0];
             }
+            if (moveX == 0 && moveY == 0 && apple_x1 == 99999 && apple_x2 == 99999 && apple_x3 == 99999) {
+                inGame = false;
+            }
         }
-        if (moveX > 0) {
+        if (moveX > 0 && moveX <= 10000) {
             x[0] += DOT_SIZE;
             moveX -= DOT_SIZE;
-        } else if (moveX < 0) {
+        } else if (moveX < 0 && moveX <= 10000) {
             x[0] -= DOT_SIZE;
             moveX += DOT_SIZE;
         } else {
-            if (moveY > 0) {
+            if (moveY > 0 && moveY <= 10000) {
                 y[0] += DOT_SIZE;
                 moveY -= DOT_SIZE;
-            } else if (moveY < 0) {
+            } else if (moveY < 0 && moveY <= 10000) {
                 y[0] -= DOT_SIZE;
                 moveY += DOT_SIZE;
             }
         }
-    }
-
-
-    private void gameOver(Graphics g) {
-        
-        String msg = "Success!!";
-        Font small = new Font("Helvetica", Font.BOLD, 20);
-        FontMetrics metr = getFontMetrics(small);
-
-        g.setColor(Color.white);
-        g.setFont(small);
-        g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, B_HEIGHT / 2);
     }
 }
