@@ -87,17 +87,24 @@ public class Board extends JPanel implements ActionListener {
         apple_x3 = ((int) (Math.random() * RANDOM_APPLE_POS)) * DOT_SIZE;
         apple_y3 = ((int) (Math.random() * RANDOM_APPLE_POS)) * DOT_SIZE;
 
+        distances.add(0);
+        distances.add(0);
+        distances.add(0);
+        updateDistance();
+        
+        timer = new Timer(DELAY, this);
+        timer.start();
+    }
+
+    public void updateDistance() {
         dist1 = checkDistance(apple_x1, apple_y1);
         dist2 = checkDistance(apple_x2, apple_y2);
         dist3 = checkDistance(apple_x3, apple_y3);
 
-        distances.add(dist1);
-        distances.add(dist2);
-        distances.add(dist3);
+        distances.set(0, dist1);
+        distances.set(1, dist2);
+        distances.set(2, dist3);
         Collections.sort(distances);
-        
-        timer = new Timer(DELAY, this);
-        timer.start();
     }
 
     private int checkDistance(int x1, int y1) {
@@ -111,9 +118,8 @@ public class Board extends JPanel implements ActionListener {
     }
     
     private void doDrawing(Graphics g) {
-        if (index == 3) {
+        if (!inGame) {
             gameOver(g);
-            inGame = false;
         } else {
             g.drawImage(apple, apple_x1, apple_y1, this);
             g.drawImage(apple, apple_x2, apple_y2, this);
@@ -141,19 +147,30 @@ public class Board extends JPanel implements ActionListener {
 
     private void move() {
         if (moveX == 0 && moveY == 0) {
-            index++;
-            if (index < 3) {
-                if (dist1 == distances.get(index)) {
-                    moveX = apple_x1 - x[0];
-                    moveY = apple_y1 - y[0];
-                } else if (dist2 == distances.get(index)) {
-                    moveX = apple_x2 - x[0];
-                    moveY = apple_y2 - y[0];
-                } else if (dist3 == distances.get(index)) {
-                    moveX = apple_x3 - x[0];
-                    moveY = apple_y3 - y[0];
-                }
+            updateDistance();
+            if (dist1 == distances.get(0)) {
+                moveX = apple_x1 - x[0];
+                moveY = apple_y1 - y[0];
+            } else if (dist2 == distances.get(0)) {
+                moveX = apple_x2 - x[0];
+                moveY = apple_y2 - y[0];
+            } else if (dist3 == distances.get(0)) {
+                moveX = apple_x3 - x[0];
+                moveY = apple_y3 - y[0];
             }
+            System.out.println(dist1);
+            System.out.println(dist2);
+            System.out.println(dist3);
+            System.out.println(distances.get(0));
+            // System.out.println(apple_x1);
+            // System.out.println(apple_y1);
+            // System.out.println(apple_x2);
+            // System.out.println(apple_y2);
+            // System.out.println(apple_x3);
+            // System.out.println(apple_y3);
+            // if (moveX == 0 && moveY == 0) {
+            //     inGame = false;
+            // }
         }
         if (moveX > 0) {
             x[0] += DOT_SIZE;
