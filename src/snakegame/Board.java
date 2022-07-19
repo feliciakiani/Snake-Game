@@ -34,7 +34,6 @@ public class Board extends JPanel implements ActionListener {
 
     ArrayList<Integer> distances = new ArrayList<Integer>();
 
-    private int index = -1;
     private int moveX = 0;
     private int moveY = 0;
     private int dist1;
