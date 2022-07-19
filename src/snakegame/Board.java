@@ -157,19 +157,6 @@ public class Board extends JPanel implements ActionListener {
                 moveX = apple_x3 - x[0];
                 moveY = apple_y3 - y[0];
             }
-            System.out.println(dist1);
-            System.out.println(dist2);
-            System.out.println(dist3);
-            System.out.println(distances.get(0));
-            // System.out.println(apple_x1);
-            // System.out.println(apple_y1);
-            // System.out.println(apple_x2);
-            // System.out.println(apple_y2);
-            // System.out.println(apple_x3);
-            // System.out.println(apple_y3);
-            // if (moveX == 0 && moveY == 0) {
-            //     inGame = false;
-            // }
         }
         if (moveX > 0) {
             x[0] += DOT_SIZE;
